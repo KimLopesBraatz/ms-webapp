@@ -7,19 +7,24 @@ import SearchIcon from '@material-ui/icons/Search';
 import {AppBar, Toolbar, InputBase, IconButton, Fab} from '@material-ui/core';
 import Modal from "../modal/Modal";
 
-export default class Home extends Component<any, any> {
+export default class Home extends Component<any, { personList: any; editPerson: any; openModal: boolean; handleInputs: any}> {
     constructor(props: any) {
         super(props);
         this.state = {
             personList: [],
-            editPerson: {},
+            editPerson: null,
             openModal: false,
+            handleInputs: {
+                inputName: this.handleName,
+                inputItin: this.handleItin,
+                inputDateOfBirth: this.handleDateOfBirth,
+                inputEmail: this.handleEmail,
+            }
         }
     }
 
     componentDidMount(): void {
         axiosInstance.get('/person').then(response => {
-            console.log(response);
             this.setState({ personList: response.data });
         });
     }
@@ -31,6 +36,65 @@ export default class Home extends Component<any, any> {
 
     handleCloseModal = () => {
         this.setState({ openModal: false });
+        this.setState({ editPerson: null });
+    };
+
+    refreshList = () => {
+        axiosInstance.get('/person').then(response => {
+            this.setState({ personList: response.data });
+        });
+    };
+
+    handleName = (nameValue: string) => {
+        this.setState(
+            prevState => (
+                {
+                    editPerson: {
+                        ...prevState.editPerson,
+                        name: nameValue
+                    }
+                }
+            )
+        );
+    };
+
+    handleItin = (itinValue: string) => {
+        this.setState(
+            prevState => (
+                {
+                    editPerson: {
+                        ...prevState.editPerson,
+                        itin: itinValue
+                    }
+                }
+            )
+        );
+    };
+
+    handleDateOfBirth = (dateOfBirthValue: string) => {
+        this.setState(
+            prevState => (
+                {
+                    editPerson: {
+                        ...prevState.editPerson,
+                        dateOfBirth: dateOfBirthValue
+                    }
+                }
+            )
+        );
+    };
+
+    handleEmail = (emailValue: string) => {
+        this.setState(
+            prevState => (
+                {
+                    editPerson: {
+                        ...prevState.editPerson,
+                        email: emailValue
+                    }
+                }
+            )
+        );
     };
 
     render() {
@@ -42,13 +106,7 @@ export default class Home extends Component<any, any> {
                             backgroundRepeat: 'no-repeat' }}>
                     <Toolbar>
                         <div style={{ float: 'left' }}>
-                            <IconButton type='submit' aria-label='search' style={{ padding: 10 }}>
-                                <SearchIcon />
-                            </IconButton>
-                            <InputBase style={{ marginLeft: 10, flex: 1 }}
-                                placeholder="Pesquisar..."
-                                inputProps={{ 'aria-label': 'Pesquisar...' }}
-                            />
+                            <h2 style={{ color: 'white' }}>Pessoas</h2>
                         </div>
                     </Toolbar>
                 </AppBar>
@@ -56,10 +114,14 @@ export default class Home extends Component<any, any> {
                     <TableList personList={this.state.personList} openModal={this.handleClickOpen}/>
                 </div>
                 <div style={{ position: 'fixed', bottom: 0, width: '100%' }}>
-                    <Fab onClick={() => this.handleClickOpen(null)} style={{ float: 'right', margin: 40 }} color="primary" aria-label="add">
+                    <Fab onClick={() => this.handleClickOpen(null)}
+                         style={{ float: 'right', margin: 40 }} color="primary" aria-label="add">
                         <AddIcon />
                     </Fab>
-                    <Modal openModal={this.state.openModal} onClose={this.handleCloseModal} person={this.state.editPerson}/>
+                    <Modal openModal={this.state.openModal} onClose={this.handleCloseModal}
+                           person={this.state.editPerson} refreshList={this.refreshList}
+                           handleInputs={this.state.handleInputs}
+                    />
                 </div>
             </div>
         );

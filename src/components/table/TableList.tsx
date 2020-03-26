@@ -30,7 +30,7 @@ export default class TableList extends Component<any, any>{
 
     render() {
         return (
-            <TableContainer component={Paper} style={{ marginTop: 60 }}>
+            <TableContainer component={Paper} style={{ marginTop: 70 }}>
                 <Table style={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>

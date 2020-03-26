@@ -2,7 +2,7 @@
   "name": "ms-webapp",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:8080/v1/api",
+  "proxy": "http://localhost:8080/v1/api/*",
   "dependencies": {
     "@material-ui/core": "^4.9.7",
     "@material-ui/icons": "^4.9.1",
