@@ -26,11 +26,12 @@ import IAddress from "../../model/IAddress";
 
 export default class Modal extends Component<
     { person: IPerson; openModal: any; onClose: any; refreshList: any; handleInputs: any } ,
-    { person: IPerson; phones: any; phone: IPhone; addresses: any; address: IAddress ;isClosePhoneDetail: boolean; isCloseAddressDetail: boolean }> {
+    { person: IPerson; isValidItin: boolean; phones: any; phone: IPhone; addresses: any; address: IAddress; isClosePhoneDetail: boolean; isCloseAddressDetail: boolean }> {
     constructor(props: any) {
         super(props);
         this.state = {
             person: { name: '', itin: '', dateOfBirth: undefined, email: '', },
+            isValidItin: true,
             phones: [],
             phone: { areaCode: '', number: undefined, },
             addresses: [],
@@ -344,17 +345,50 @@ export default class Modal extends Component<
     };
 
     validItin = () => {
-        let itin = (this.props.person) ? this.props.person : this.state.person;
-        let soma = 0;
-        let resto;
-        if (itin === '00000000000') return false;
+        let itin = (this.props.person) ? this.props.person.itin : this.state.person.itin;
+        // @ts-ignore
+        itin = itin.trim().replace(/[^\d]+/g,'');
+        if(itin.trim().length === 0) {
+            this.setState({ isValidItin: false });
+            return false;
+        }
 
-        return false
+        if (itin.length !== 11 || itin === "00000000000" || itin === "11111111111" || itin === "22222222222" ||
+            itin === "33333333333" || itin === "44444444444" || itin === "55555555555" || itin === "66666666666" ||
+            itin === "77777777777" || itin === "88888888888" || itin === "99999999999") {
+            this.setState({ isValidItin: false });
+            return false;
+        }
+
+        let add = 0;
+        for (let i=0; i < 9; i ++)
+            add += parseInt(itin.charAt(i)) * (10 - i);
+        let rev = 11 - (add % 11);
+        if (rev == 10 || rev == 11)
+            rev = 0;
+        if (rev != parseInt(itin.charAt(9))) {
+            this.setState({ isValidItin: false });
+            return false;
+        }
+
+        add = 0;
+        for (let i = 0; i < 10; i ++)
+            add += parseInt(itin.charAt(i)) * (11 - i);
+        rev = 11 - (add % 11);
+        if (rev === 10 || rev === 11)
+            rev = 0;
+        if (rev !== parseInt(itin.charAt(10))) {
+            this.setState({ isValidItin: false });
+            return false;
+        }
+        this.setState({ isValidItin: true });
+        return true;
     };
 
     render() {
         const title = this.props.person === null ? 'Cadastrar Pessoa' : 'Editar Pessoa';
         const { name, itin, dateOfBirth, email } = (this.props.person) ? this.props.person : this.state.person;
+        let show = (!this.state.isValidItin) ? 'block' : 'none';
         return(
             <Dialog open={ this.props.openModal } fullWidth={ true } maxWidth='md'>
                 <DialogTitle id="title">{title}</DialogTitle>
@@ -363,11 +397,13 @@ export default class Modal extends Component<
                     <TextField value={itin} onChange={this.handleItin} onBlur={this.validItin} style={{ width: "49%", marginTop: 10 }} id="cpf" label="CPF" variant="outlined" />
                     <TextField value={dateOfBirth} onChange={this.handleDateOfBirth} style={{ width: "49%", marginTop: 10, float: 'right' }} id="dtNascimento" label="Data de nascimento" variant="outlined" />
                     <TextField value={email} onChange={this.handleEmail} style={{ width: "100%", marginTop: 10 }} id="email" label="E-mail" variant="outlined" />
+                    <span style={{ display: show, marginTop: 10, color: 'red' }}>{`CPF invalido!`}</span>
                     {this.renderAddresses()}
                     {this.renderPhones()}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={this.save} variant="contained" color="primary"
+                            disabled={!this.state.isValidItin}
                             startIcon={<SaveIcon />}>
                         Salvar
                     </Button>
@@ -375,7 +411,6 @@ export default class Modal extends Component<
                         Cancelar
                     </Button>
                 </DialogActions>
-                <Snackbar open={this.validItin()} autoHideDuration={60} message='TESTE'/>
             </Dialog>
         );
     }
