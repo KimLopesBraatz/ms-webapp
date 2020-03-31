@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import '../../styles/App.css';
-import axiosInstance from '../api/axiosConfig';
+import Modal from "../modal/Modal";
 import TableList from "../table/TableList";
 import AddIcon from '@material-ui/icons/Add';
-import SearchIcon from '@material-ui/icons/Search';
-import {AppBar, Toolbar, InputBase, IconButton, Fab} from '@material-ui/core';
-import Modal from "../modal/Modal";
+import axiosInstance from '../api/axiosConfig';
+import {AppBar, Toolbar, Fab} from '@material-ui/core';
 
 export default class Home extends Component<any, { personList: any; editPerson: any; openModal: boolean; handleInputs: any}> {
     constructor(props: any) {

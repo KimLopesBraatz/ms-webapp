@@ -8,7 +8,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import IPerson from "../../model/IPerson";
 
-export default class TableList extends Component<any, any>{
+export default class TableList extends Component<{ personList: Array<IPerson>; openModal: any }, any>{
 
     renderTableBody = () => {
         const list = this.props.personList;
